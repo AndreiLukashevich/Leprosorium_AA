@@ -8,12 +8,21 @@ def init_db
 	@db = SQLite3::Database.new 'leprosorium.db'
 	@db.results_as_hash = true
 end
+
+# before вызывается каждый раз при перезагрузке любой страницы
 before do
+	# инициализация БД
+
 	init_db
 end
 
+ # configure вызывается каждый раз при конфигурации приложения:
+ # когда изменился код програмы И перезагрузилась страница
+
 configure do
+	# инициализация БД
 	init_db
+	# Создание таблицы, если она не существует
 	@db.execute 'create table if not exists Posts
 		(
 			id	INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,11 +37,16 @@ get '/' do
 	<a href=\"http://rubyschool.us/\">Ruby School</a>"
 end
 
+# обрботчик get-запроса /new
+#(браузер получает страницу с сервера)
 get '/new' do
 	erb :new
 end
 
+# обрботчик post-запроса /new
+#(браузер отправляет данные на сервер)
 post '/new' do
-	@content = params[:content]
-	erb "You typed #{@content}"
+	# получаем переменную из post-запроса
+	content = params[:content]
+	erb "You typed #{content}"
 end
